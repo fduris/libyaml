@@ -7,8 +7,10 @@ set (YAML_VERSION_MINOR 2)
 set (YAML_VERSION_PATCH 5)
 set (YAML_VERSION_STRING "${YAML_VERSION_MAJOR}.${YAML_VERSION_MINOR}.${YAML_VERSION_PATCH}")
 
-option(BUILD_SHARED_LIBS "Build libyaml as a shared library" OFF)
+option(BUILD_SHARED_LIBS "Build libyaml as a shared library" ON)
 set(YAML_STATIC_LIB_NAME "yaml" CACHE STRING "Base name of static library output")
+
+option(COPY_LIB_TO_MT "Copy library to MT directory" ON)
 
 #
 # Output directories for a build tree
@@ -158,3 +160,10 @@ install(
   FILES ${config_version_file}
   DESTINATION ${INSTALL_CMAKE_DIR} COMPONENT Development
   )
+
+if(COPY_LIB_TO_MT)
+  set(MT_DIR "${CMAKE_BINARY_DIR}/../../..")
+  add_custom_command(TARGET yaml POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:yaml> ${MT_DIR}/$<TARGET_FILE_NAME:yaml>
+  )
+endif()
